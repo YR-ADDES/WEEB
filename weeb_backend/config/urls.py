@@ -1,12 +1,17 @@
 ## IMPORTS DJANGO ##
-from django.contrib import admin
-from django.urls    import path, include
+from django.contrib         import admin
+from django.urls            import path, include
+from rest_framework.routers import DefaultRouter
+from articles.views         import ArticleViewSet
+from contacts.views         import ContactViewSet
 
-## ROUTES PRINCIPALES ##
+## ROUTER API ##
+router = DefaultRouter()
+router.register('articles', ArticleViewSet)
+router.register('contacts', ContactViewSet)
+
+## URLS PRINCIPALES ##
 urlpatterns = [
-    ## ADMIN ##
-    path("admin/", admin.site.urls),
-
-    ## API ##
-    path("api/", include("api.urls")),
+    path('admin/',  admin.site.urls),
+    path('api/',    include(router.urls)),
 ]

@@ -33,6 +33,11 @@ INSTALLED_APPS = [
 
     ## APPLICATIONS LOCALES ##
     'api',
+
+    ## APPS PROJET ##
+    'utilisateurs',
+    'articles',
+    'contacts',
 ]
 
 ## MIDDLEWARE ##
@@ -90,6 +95,9 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
 ]
+
+## MODELE UTILISATEUR PERSONNALISE ##
+AUTH_USER_MODEL = 'utilisateurs.Utilisateur'
 
 ## LANGUE & TIMEZONE ##
 LANGUAGE_CODE   = 'fr-fr'
