@@ -3,6 +3,9 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 
+## IMPORT SIMPLE JWT ##
+from datetime import timedelta
+
 ## CHARGEMENT VARIABLES ENV ##
 load_dotenv()
 
@@ -28,8 +31,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    ## TIERS ##
+     ## TIERS ##
     'rest_framework',
+    'rest_framework_simplejwt',
 
     ## APPLICATIONS LOCALES ##
     'api',
@@ -110,3 +114,22 @@ STATIC_URL      = 'static/'
 
 ## CLE PRIMAIRE PAR DEFAUT ##
 DEFAULT_AUTO_FIELD  = 'django.db.models.BigAutoField'
+
+## CONFIGURATION REST FRAMEWORK ##
+REST_FRAMEWORK = {
+    ## AUTHENTIFICATION JWT ##
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    ## PERMISSION PAR DEFAUT (PUBLIC) ##
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+    ),
+}
+
+## CONFIGURATION JWT ##
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
