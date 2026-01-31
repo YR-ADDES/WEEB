@@ -19,7 +19,10 @@ SECRET_KEY = 'django-insecure-weeb-backend'
 DEBUG = True
 
 ## HOTES AUTORISES ##
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+]
 
 ## APPLICATIONS INSTALLEES ##
 INSTALLED_APPS = [
@@ -30,6 +33,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    ## CORS ##
+    "corsheaders",    
 
      ## TIERS ##
     'rest_framework',
@@ -52,8 +58,18 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware', 
+    
+    ## CORS ##
+    "corsheaders.middleware.CorsMiddleware",   
 ]
+
+## CORS AUTORISÉS ##
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
+ 
+CORS_ALLOW_CREDENTIALS = True
 
 ## ROUTES PRINCIPALES ##
 ROOT_URLCONF = 'config.urls'
@@ -129,7 +145,21 @@ REST_FRAMEWORK = {
 
 ## CONFIGURATION JWT ##
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'AUTH_HEADER_TYPES': ('Bearer',),
+    'ACCESS_TOKEN_LIFETIME':    timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME':   timedelta(days=1),
+    'AUTH_HEADER_TYPES':        ('Bearer',),
 }
+
+## HEADERS CORS AUTORISÉS ##
+from corsheaders.defaults import default_headers
+
+CORS_ALLOW_HEADERS  = list(default_headers)
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]

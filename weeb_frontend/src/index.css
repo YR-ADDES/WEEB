@@ -1,0 +1,15 @@
+/* ## IMPORT DES BASES TAILWIND ## */
+@tailwind base;
+
+/* ## IMPORT DES COMPOSANTS TAILWIND ## */
+@tailwind components;
+
+/* ## IMPORT DES UTILITAIRES TAILWIND ## */
+@tailwind utilities;
+
+/* ## STYLE GLOBAL DU BODY ## */
+body {
+  background-color: #0E1729 !important ;
+  margin: 0;
+  padding: 0;
+}
