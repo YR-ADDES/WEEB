@@ -1,0 +1,12 @@
+## CONFIG NETLIFY ##
+[build]
+  ## COMMANDE DE BUILD ##
+  command = "npm run build"
+  ## DOSSIER DE SORTIE VITE ##
+  publish = "dist"
+
+## ROUTING SPA (REACT ROUTER) ##
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,10 +1,13 @@
 // ## IMPORTS ##
 import axios from "axios";
 
+// ## URL BACKEND (ENV LOCAL / PROD) ##
+const url_api = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
 // ## INSTANCE AXIOS ##
 const api = axios.create({
   // ## URL BACKEND DJANGO ##
-  baseURL: "http://127.0.0.1:8000",
+  baseURL: url_api,
 
   // ## HEADERS JSON ##
   headers: {
