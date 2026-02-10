@@ -38,7 +38,7 @@ export default function Article() {
         }
 
         // ## APPEL API : DETAIL ## //
-        const reponse = await api.get(`articles/${id}/`);
+        const reponse = await api.get(`/api/articles/${id}/`);
 
         // ## SET ARTICLE ## //
         if (composant_monte) {
@@ -80,7 +80,7 @@ export default function Article() {
   // ## ETAT : ERREUR ## //
   if (erreur) {
     return (
-      <div className="bg-[#0E1729] min-h-screen text-white flex items-center justify-center text-red-400">
+      <div className="bg-[#0E1729] min-h-screen flex items-center justify-center text-red-400">
         {erreur}
       </div>
     );

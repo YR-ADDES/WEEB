@@ -1,6 +1,6 @@
 ## IMPORTS DJANGO ##
-from django.contrib     import admin
-from django.urls        import path, include
+from django.contrib import admin
+from django.urls    import path, include
 
 ## IMPORTS ROUTER ##
 from rest_framework.routers import DefaultRouter
@@ -12,21 +12,21 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 ## ROUTER API ##
 router = DefaultRouter()
-router.register('articles', ArticleViewSet)
-router.register('contacts', ContactViewSet)
+router.register("articles", ArticleViewSet, basename="articles")
+router.register("contacts", ContactViewSet, basename="contacts")
 
 ## URLS PRINCIPALES ##
 urlpatterns = [
     ## ADMIN ##
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
 
-    ## AUTH JWT ##
-    path('api/login/',          TokenObtainPairView.as_view(),  name='login'),
-    path('api/token/refresh/',  TokenRefreshView.as_view(),     name='token_refresh'),
-
-    ## SIGNUP ##
-    path('api/utilisateurs/', include('utilisateurs.urls')),
+    ## AUTH JWT (OPTIONNEL SI TU UTILISES TA CONNEXION CUSTOM) ##
+    path("api/login/",          TokenObtainPairView.as_view(), name="login"),
+    path("api/token/refresh/",  TokenRefreshView.as_view(), name="token_refresh"),
 
     ## API ROUTER ##
-    path('api/', include(router.urls)),
+    path("api/", include(router.urls)),
+
+    ## API UTILISATEURS ##
+    path("api/utilisateurs/", include("utilisateurs.urls")),
 ]

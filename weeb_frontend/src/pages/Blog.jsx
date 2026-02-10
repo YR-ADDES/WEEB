@@ -43,7 +43,7 @@ export default function Blog() {
         }
 
         // ## APPEL API : LISTE ARTICLES ## //
-        const reponse = await api.get("articles/");
+        const reponse = await api.get("/api/articles/");
 
         // ## NORMALISATION : ON GARDE UN TABLEAU ## //
         const data = Array.isArray(reponse.data) ? reponse.data : [];
@@ -132,12 +132,12 @@ export default function Blog() {
         )}
 
         {/* ## LISTE ## */}
-        {!loading && !erreur_msg && articles.length > 0 && (
+        {!loading && !erreur_msg && articles.length > 0 && ( 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {articles.map((article) => (
               <article
                 key={article.id}
-                className="bg-[#1A2334] border border-[#2A3550] rounded-2xl shadow-md p-8 hover:border-purple-500/40 hover:shadow-lg transition"
+                className="bg-[#1A2334] border border-[#2A3550] rounded-2xl shadow-md p-8 hover:border-purple-500/40 hover:shadow-lg transition flex flex-col min-h-[360px]"
               >
                 {/* ## BADGE DATE ## */}
                 <div className="flex justify-between items-center mb-6">
@@ -168,18 +168,19 @@ export default function Blog() {
                 </p>
 
                 {/* ## CTA ## */}
-                <div className="flex justify-end mt-8">
+                <div className="mt-auto pt-6 flex justify-end">
                   <Link
                     to={`/article/${article.id}`}
-                    className="text-sm font-bold text-white hover:text-purple-300 hover:underline transition"
+                    className="group inline-flex items-center gap-2 text-sm font-semibold text-purple-300 transition hover:text-purple-200"
                   >
-                    Lire l’article →
+                    <span>Lire l’article</span>
+                    <span className="transition-transform group-hover:translate-x-1">→</span>
                   </Link>
                 </div>
               </article>
             ))}
           </div>
-        )}
+        )} 
       </div>
     </div>
   );
