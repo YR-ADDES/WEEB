@@ -36,16 +36,25 @@ export default function Joinnow() {
     setLoading(true);
 
     try {
-      // ## APPEL API INSCRIPTION ##
-      const res = await api.post("/api/utilisateurs/inscription/", {
-        prenom: prenom,
-        nom: nom,
-        email: email,
-        password: mot_de_passe,
-      });
+      // ✅ INSCRIPTION SANS TOKEN (override Authorization)
+      const res = await api.post(
+        "/api/utilisateurs/inscription/",
+        {
+          prenom: prenom,
+          nom: nom,
+          email: email,
+          password: mot_de_passe,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "",
+          },
+        }
+      );
 
       // ## SUCCES ##
-      setMessage_succes(res.data.message);
+      setMessage_succes(res?.data?.message || "Compte créé avec succès.");
 
       // ## RESET FORM ##
       setNom("");
@@ -62,7 +71,9 @@ export default function Joinnow() {
         "Erreur lors de la création du compte.";
 
       setMessage_erreur(
-        typeof erreur_api === "string" ? erreur_api : "Erreur lors de la création du compte."
+        typeof erreur_api === "string"
+          ? erreur_api
+          : "Erreur lors de la création du compte."
       );
     } finally {
       // ## FIN LOADING ##

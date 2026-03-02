@@ -1,5 +1,5 @@
 // ## IMPORTS ##
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import api from "../api/api_front.js";
 import { AuthContext } from "./AuthContext.jsx";
 
@@ -8,14 +8,48 @@ export default function AuthProvider({ children }) {
   // ## ETATS ##
   const [utilisateur, setUtilisateur] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token_access") || "");
+  const [loading_auth, setLoadingAuth] = useState(Boolean(token));
+
+  // ## CHARGER PROFIL SI TOKEN PRESENT (AU REFRESH) ##
+  useEffect(() => {
+    let mounted = true;
+
+    async function charger_profil() {
+      if (!token) {
+        if (mounted) {
+          setUtilisateur(null);
+          setLoadingAuth(false);
+        }
+        return;
+      }
+
+      try {
+        const res = await api.get("/api/utilisateurs/me/");
+        if (mounted) setUtilisateur(res.data);
+      } catch {
+        // Token invalide => nettoyage
+        localStorage.removeItem("token_access");
+        localStorage.removeItem("token_refresh");
+
+        if (mounted) {
+          setToken("");
+          setUtilisateur(null);
+        }
+      } finally {
+        if (mounted) setLoadingAuth(false);
+      }
+    }
+
+    charger_profil();
+
+    return () => {
+      mounted = false;
+    };
+  }, [token]);
 
   // ## FONCTION CONNEXION ##
   async function connexion(email, password) {
-    // ## APPEL BACKEND ##
-    const res = await api.post("/api/utilisateurs/connexion/", {
-      email,
-      password,
-    });
+    const res = await api.post("/api/utilisateurs/connexion/", { email, password });
 
     // ## STOCKAGE TOKEN ##
     localStorage.setItem("token_access", res.data.access);
@@ -23,18 +57,15 @@ export default function AuthProvider({ children }) {
 
     // ## MAJ ETATS ##
     setToken(res.data.access);
-    setUtilisateur(res.data.utilisateur);
+    setUtilisateur(res.data.utilisateur || null);
 
     return res.data;
   }
 
   // ## FONCTION DECONNEXION ##
   function deconnexion() {
-    // ## SUPPRESSION STORAGE ##
     localStorage.removeItem("token_access");
     localStorage.removeItem("token_refresh");
-
-    // ## RESET ETATS ##
     setToken("");
     setUtilisateur(null);
   }
@@ -44,11 +75,12 @@ export default function AuthProvider({ children }) {
     return {
       utilisateur,
       token,
+      loading_auth,
       est_connecte: Boolean(token),
       connexion,
       deconnexion,
     };
-  }, [utilisateur, token]);
+  }, [utilisateur, token, loading_auth]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

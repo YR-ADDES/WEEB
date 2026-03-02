@@ -7,12 +7,25 @@ import { Link } from "react-router-dom";
 // ## IMPORT API ## //
 import api from "../api/api_front.js";
 
+// ## IMPORT AUTH ##
+import { useAuth } from "../auth/AuthContext.jsx";
+
 // ## PAGE : BLOG (LISTE ARTICLES) ## //
 export default function Blog() {
+  // ## AUTH ##
+  const { token } = useAuth();
+
   // ## ETATS ## //
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [erreur_msg, setErreurMsg] = useState("");
+
+  // ## MODAL NOUVEL ARTICLE ##
+  const [modal_ouvert, setModalOuvert] = useState(false);
+  const [titre_new, setTitreNew] = useState("");
+  const [contenu_new, setContenuNew] = useState("");
+  const [loading_new, setLoadingNew] = useState(false);
+  const [erreur_new, setErreurNew] = useState("");
 
   // ## FORMAT DATE ## //
   function formater_date(date_creation) {
@@ -31,34 +44,26 @@ export default function Blog() {
 
   // ## EFFET : CHARGEMENT DES ARTICLES ## //
   useEffect(() => {
-    // ## DRAPEAU MONTAGE (EVITE SETSTATE APRES DEMONTAGE) ## //
     let composant_monte = true;
 
     async function charger_articles() {
       try {
-        // ## RESET ETATS ## //
         if (composant_monte) {
           setLoading(true);
           setErreurMsg("");
         }
 
-        // ## APPEL API : LISTE ARTICLES ## //
         const reponse = await api.get("/api/articles/");
-
-        // ## NORMALISATION : ON GARDE UN TABLEAU ## //
         const data = Array.isArray(reponse.data) ? reponse.data : [];
 
-        // ## MISE A JOUR ETAT ## //
         if (composant_monte) {
           setArticles(data);
         }
       } catch {
-        // ## MESSAGE ERREUR ## //
         if (composant_monte) {
           setErreurMsg("IMPOSSIBLE DE CHARGER LES ARTICLES.");
         }
       } finally {
-        // ## FIN CHARGEMENT ## //
         if (composant_monte) {
           setLoading(false);
         }
@@ -67,17 +72,69 @@ export default function Blog() {
 
     charger_articles();
 
-    // ## CLEANUP ## //
     return () => {
       composant_monte = false;
     };
   }, []);
 
+  // ## CREER ARTICLE ##
+  async function creer_article(e) {
+    e.preventDefault();
+    setErreurNew("");
+
+    if (!token) {
+      setErreurNew("Connexion requise.");
+      return;
+    }
+
+    setLoadingNew(true);
+
+    try {
+      const res = await api.post("/api/articles/", {
+        titre: titre_new,
+        contenu: contenu_new,
+      });
+
+      // Ajout direct en haut
+      setArticles((prev) => [res.data, ...prev]);
+
+      // Reset + fermeture
+      setTitreNew("");
+      setContenuNew("");
+      setModalOuvert(false);
+    } catch (err) {
+      const status = err?.response?.status;
+      if (status === 401) {
+        setErreurNew("Token invalide / expiré. Reconnecte-toi.");
+      } else if (status === 403) {
+        setErreurNew("Accès refusé (droits).");
+      } else {
+        setErreurNew("Erreur création article.");
+      }
+    } finally {
+      setLoadingNew(false);
+    }
+  }
+
+  // ## OUVRIR MODAL ##
+  function ouvrir_modal() {
+    setErreurNew("");
+    setModalOuvert(true);
+  }
+
+  // ## FERMER MODAL ##
+  function fermer_modal() {
+    setErreurNew("");
+    setModalOuvert(false);
+  }
+
   // ## RENDU ## //
   return (
     <div className="bg-[#0E1729] min-h-screen text-white">
       <div className="max-w-6xl mx-auto py-14 px-6">
-        {/* ## HEADER ## */}
+        {/* ========================= */}
+        {/* HEADER */}
+        {/* ========================= */}
         <header className="text-center mb-12">
           <p className="text-xs uppercase tracking-[0.35em] text-gray-400">
             weeb blog
@@ -92,9 +149,23 @@ export default function Blog() {
           <p className="text-gray-400 mt-4 max-w-2xl mx-auto">
             Ressources front, back, architecture, bonnes pratiques et performance.
           </p>
+
+          {/* ## BOUTON NOUVEL ARTICLE (CONNECTÉ) ## */}
+          {token && (
+            <div className="mt-8 flex justify-center">
+              <button
+                onClick={ouvrir_modal}
+                className="px-6 py-3 rounded-2xl bg-purple-600/90 hover:bg-purple-600 transition font-semibold"
+              >
+                + Nouvel article
+              </button>
+            </div>
+          )}
         </header>
 
-        {/* ## ETAT : LOADING ## */}
+        {/* ========================= */}
+        {/* ETAT : LOADING */}
+        {/* ========================= */}
         {loading && (
           <div className="flex justify-center mt-16">
             <div className="bg-[#1A2334] border border-[#2A3550] rounded-2xl px-10 py-8 shadow-md text-center max-w-md w-full">
@@ -105,7 +176,9 @@ export default function Blog() {
           </div>
         )}
 
-        {/* ## ETAT : ERREUR ## */}
+        {/* ========================= */}
+        {/* ETAT : ERREUR */}
+        {/* ========================= */}
         {!loading && erreur_msg && (
           <div className="flex justify-center mt-16">
             <div className="bg-[#1A2334] border border-red-500/30 rounded-2xl px-10 py-8 shadow-md text-center max-w-md w-full">
@@ -116,7 +189,9 @@ export default function Blog() {
           </div>
         )}
 
-        {/* ## ETAT : VIDE ## */}
+        {/* ========================= */}
+        {/* ETAT : VIDE */}
+        {/* ========================= */}
         {!loading && !erreur_msg && articles.length === 0 && (
           <div className="flex justify-center mt-16">
             <div className="bg-[#1A2334] border border-[#2A3550] rounded-2xl px-10 py-8 shadow-md text-center max-w-md w-full">
@@ -131,8 +206,10 @@ export default function Blog() {
           </div>
         )}
 
-        {/* ## LISTE ## */}
-        {!loading && !erreur_msg && articles.length > 0 && ( 
+        {/* ========================= */}
+        {/* LISTE */}
+        {/* ========================= */}
+        {!loading && !erreur_msg && articles.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {articles.map((article) => (
               <article
@@ -174,13 +251,81 @@ export default function Blog() {
                     className="group inline-flex items-center gap-2 text-sm font-semibold text-purple-300 transition hover:text-purple-200"
                   >
                     <span>Lire l’article</span>
-                    <span className="transition-transform group-hover:translate-x-1">→</span>
+                    <span className="transition-transform group-hover:translate-x-1">
+                      →
+                    </span>
                   </Link>
                 </div>
               </article>
             ))}
           </div>
-        )} 
+        )}
+
+        {/* ========================= */}
+        {/* MODAL : NOUVEL ARTICLE */}
+        {/* ========================= */}
+        {modal_ouvert && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+            {/* overlay */}
+            <div
+              className="absolute inset-0 bg-black/70"
+              onClick={fermer_modal}
+            />
+
+            {/* modal */}
+            <div className="relative w-full max-w-2xl bg-[#1A2334] border border-[#2A3550] rounded-2xl p-8 shadow-xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-extrabold uppercase">Nouvel article</h2>
+                <button
+                  onClick={fermer_modal}
+                  className="text-gray-300 hover:text-white"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {erreur_new ? (
+                <p className="text-red-300 text-sm mb-4">{erreur_new}</p>
+              ) : null}
+
+              <form onSubmit={creer_article} className="space-y-4">
+                <input
+                  className="w-full bg-transparent border border-[#2A3550] rounded-xl px-4 py-3 outline-none"
+                  placeholder="Titre"
+                  value={titre_new}
+                  onChange={(e) => setTitreNew(e.target.value)}
+                  required
+                />
+
+                <textarea
+                  className="w-full min-h-[200px] bg-transparent border border-[#2A3550] rounded-xl px-4 py-3 outline-none"
+                  placeholder="Contenu"
+                  value={contenu_new}
+                  onChange={(e) => setContenuNew(e.target.value)}
+                  required
+                />
+
+                <div className="flex gap-3 justify-end pt-2">
+                  <button
+                    type="button"
+                    onClick={fermer_modal}
+                    className="px-5 py-3 rounded-2xl border border-[#2A3550] hover:border-purple-400/60 transition"
+                  >
+                    Annuler
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={loading_new}
+                    className="px-5 py-3 rounded-2xl bg-purple-600/90 hover:bg-purple-600 transition font-semibold disabled:opacity-60"
+                  >
+                    {loading_new ? "Création..." : "Créer"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
