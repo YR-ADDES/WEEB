@@ -24,14 +24,14 @@ export default function App() {
 
       {/* ROUTES */}
       <Routes>
-        <Route path="/" element={<Accueil />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/article/:id" element={<Article />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/joinnow" element={<Joinnow />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/motdepasse" element={<Motdepasse />} />
+        <Route path="/"             element={<Accueil />} />
+        <Route path="/blog"         element={<Blog />} />
+        <Route path="/article/:id"  element={<Article />} />
+        <Route path="/about"        element={<About />} />
+        <Route path="/contact"      element={<Contact />} />
+        <Route path="/joinnow"      element={<Joinnow />} />
+        <Route path="/login"        element={<Login />} />
+        <Route path="/motdepasse"   element={<Motdepasse />} />
       </Routes>
 
       {/* FOOTER */}
