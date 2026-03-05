@@ -56,7 +56,7 @@ class ConnexionView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # IMPORTANT : ton user utilise l'email comme identifiant
+        ## IMPORTANT : user utilise l'email comme identifiant ##
         utilisateur = authenticate(username=email, password=password)
 
         if not utilisateur:
@@ -65,6 +65,7 @@ class ConnexionView(APIView):
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
+        ## CONTROLE ACTIVATION UTILISATEUR ##
         if not utilisateur.is_active:
             return Response(
                 {"message": "Compte en attente de validation admin."},
@@ -78,11 +79,11 @@ class ConnexionView(APIView):
                 "access": str(refresh.access_token),
                 "refresh": str(refresh),
                 "utilisateur": {
-                    "id": utilisateur.id,
-                    "email": utilisateur.email,
-                    "prenom": getattr(utilisateur, "prenom", ""),
-                    "nom": getattr(utilisateur, "nom", ""),
-                    "is_staff": utilisateur.is_staff,
+                    "id":           utilisateur.id,
+                    "email":        utilisateur.email,
+                    "prenom":       getattr(utilisateur, "prenom", ""),
+                    "nom":          getattr(utilisateur, "nom", ""),
+                    "is_staff":     utilisateur.is_staff,
                 },
             },
             status=status.HTTP_200_OK

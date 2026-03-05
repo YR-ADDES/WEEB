@@ -31,40 +31,39 @@ export default function Contact() {
   };
 
 
-  // SOUMISSION DU FORMULAIRE (APPEL API DJANGO) //
+  // SOUMISSION DU FORMULAIRE (APPEL API DJANGO) // 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      // ENVOI DES DONNÉES AU BACKEND (MAPPING FRONT -> API) //
-      const payload = {
-        first_name: formData.prenom,
-        last_name:  formData.nom,
-        email:      formData.email,
-        message:    formData.message,
-      };
+  try {
+    // ENVOI DES DONNÉES AU BACKEND (CHAMPS ALIGNÉS MODELE Contact) //
+    const payload = {
+      nom: formData.nom,
+      prenom: formData.prenom,
+      telephone: formData.telephone ? formData.telephone.replace(/\s/g, "") : null,
+      email: formData.email,
+      message: formData.message,
+    };
 
-      const res = await api.post("contact/", payload);
+    // ✅ ENDPOINT DRF VIA ROUTER : /api/contacts/
+    const res = await api.post("/api/contacts/", payload);
 
-      // MESSAGE SELON LA REPONSE API //
-      setResult(
-        res?.data?.satisfaction === 1
-          ? "Merci pour votre retour positif 😊"
-          : "Merci pour votre message, nous allons nous améliorer 😕"
-      );
+    // MESSAGE SELON LA REPONSE API (ML) //
+    setResult(
+      res?.data?.satisfaction === 1
+        ? "Merci pour votre retour positif !"
+        : "Merci pour votre message, nous allons nous améliorer."
+    );
+  } catch (err) {
+    console.error("ERREUR ENVOI CONTACT :", err);
 
-    } catch (err) {
-      // GESTION D'ERREUR (AXIOS) //
-      console.error("ERREUR ENVOI CONTACT :", err);
+    const apiMsg =
+      err?.response?.data?.detail ||
+      err?.response?.data?.message;
 
-      // MESSAGE D'ERREUR API SI DISPONIBLE //
-      const apiMsg =
-        err?.response?.data?.detail ||
-        err?.response?.data?.message;
-
-      setResult(apiMsg || "Erreur lors de l'envoi du message.");
-    }
-  };
+    setResult(apiMsg || "Erreur lors de l'envoi du message.");
+  }
+};
 
 
   // RENDU DE LA PAGE //
